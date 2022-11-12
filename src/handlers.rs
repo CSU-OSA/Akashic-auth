@@ -76,7 +76,7 @@ pub async fn handle_authenticate(
         format!("{}/{}", CONFIG.org_name, CONFIG.permission_name),
     );
     body.insert("v1", path);
-    body.insert("v2", method);
+    body.insert("v2", method.to_lowercase());
 
     let resp = client
         .post(format!("{}/api/enforce", CONFIG.endpoint))
