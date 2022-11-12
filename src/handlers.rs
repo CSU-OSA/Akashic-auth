@@ -8,7 +8,7 @@ use warp::{reject, reply, Rejection, Reply};
 
 use crate::entity::CasdoorUser;
 use crate::response::{ActiveResponse, TokenResponse};
-use crate::CONFIG;
+use crate::{CLIENT, CONFIG};
 
 /// Parse jwt token to casdoor user entity.
 fn parse_jwt_token(token: &str) -> Result<CasdoorUser, Box<dyn std::error::Error>> {
@@ -24,8 +24,7 @@ fn parse_jwt_token(token: &str) -> Result<CasdoorUser, Box<dyn std::error::Error
 /// Return FORBIDDEN if login failed.
 pub async fn handle_login(query: HashMap<String, String>) -> Result<impl Reply, Rejection> {
     let code = query.get("code").ok_or(reject::reject())?;
-    let client = reqwest::Client::new();
-    let resp = client
+    let resp = CLIENT
         .post(format!("{}/api/login/oauth/access_token?grant_type=authorization_code&client_id={}&client_secret={}&code={}", CONFIG.endpoint, CONFIG.client_id, CONFIG.client_secret, code))
         .send()
         .await
@@ -50,11 +49,9 @@ pub async fn handle_authenticate(
     let msg = format!("{{token: {}, method: {}, path: {}}}", token, method, path);
     debug!("Authenticate inbound request: {}", msg);
 
-    let client = reqwest::Client::new();
-
     // Authentication
 
-    let resp = client.post(format!("{}/api/login/oauth/introspect?token={}&token_type_hint=access_token&client_id={}&client_secret={}", CONFIG.endpoint, token, CONFIG.client_id, CONFIG.client_secret))
+    let resp = CLIENT.post(format!("{}/api/login/oauth/introspect?token={}&token_type_hint=access_token&client_id={}&client_secret={}", CONFIG.endpoint, token, CONFIG.client_id, CONFIG.client_secret))
         .send()
         .await
         .map_err(|_| reject::reject())?
@@ -78,7 +75,7 @@ pub async fn handle_authenticate(
     body.insert("v1", path);
     body.insert("v2", method.to_lowercase());
 
-    let resp = client
+    let resp = CLIENT
         .post(format!("{}/api/enforce", CONFIG.endpoint))
         .json(&body)
         .header("Content-Type", "text/plain")

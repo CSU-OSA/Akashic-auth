@@ -9,6 +9,7 @@ use entity::Config;
 use lazy_static::lazy_static;
 use log::info;
 use pretty_env_logger::env_logger;
+use reqwest::Client;
 use std::{io::Write, net::SocketAddr};
 use warp::Filter;
 
@@ -23,6 +24,7 @@ struct Args {
 lazy_static! {
     static ref CONFIG: Config = load_conf();
     static ref ARGS: Args = Args::parse();
+    static ref CLIENT: Client = Client::new();
 }
 
 /// initialize logger
