@@ -11,6 +11,7 @@ pub struct Config {
     pub jwt_pub_key: String,
     pub org_name: String,
     pub app_name: Option<String>,
+    pub permission_name: String,
 }
 
 /// User info struct, defined in the SDK.

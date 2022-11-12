@@ -2,12 +2,12 @@ use std::collections::HashMap;
 use std::convert::Infallible;
 
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
-use log::info;
+use log::debug;
 use warp::hyper::StatusCode;
 use warp::{reject, reply, Rejection, Reply};
 
 use crate::entity::CasdoorUser;
-use crate::response::TokenResponse;
+use crate::response::{ActiveResponse, TokenResponse};
 use crate::CONFIG;
 
 /// Parse jwt token to casdoor user entity.
@@ -46,31 +46,43 @@ pub async fn handle_authenticate(
     token: String,
     method: String,
     path: String,
-    session: String,
 ) -> Result<impl Reply, Rejection> {
-    let msg = format!("{{token: {:?}, method: {}, path: {}}}", token, method, path);
-    info!("Authenticate inbound request: {}", msg);
+    let msg = format!("{{token: {}, method: {}, path: {}}}", token, method, path);
+    debug!("Authenticate inbound request: {}", msg);
+
+    let client = reqwest::Client::new();
 
     // Authentication
 
-    let user = match parse_jwt_token(&token) {
-        Ok(u) => u.name,
-        Err(_) => return Ok(reply::with_status(reply::reply(), StatusCode::UNAUTHORIZED)),
-    };
+    let resp = client.post(format!("{}/api/login/oauth/introspect?token={}&token_type_hint=access_token&client_id={}&client_secret={}", CONFIG.endpoint, token, CONFIG.client_id, CONFIG.client_secret))
+        .send()
+        .await
+        .map_err(|_| reject::reject())?
+        .json::<ActiveResponse>()
+        .await
+        .map_err(|_| reject::reject())?;
+
+    debug!("{:#?}", resp);
+
+    if !resp.active {
+        return Ok(reply::with_status(reply::reply(), StatusCode::UNAUTHORIZED));
+    }
 
     // Authorization
 
     let mut body = HashMap::new();
-    body.insert("id", user);
+    body.insert(
+        "id",
+        format!("{}/{}", CONFIG.org_name, CONFIG.permission_name),
+    );
     body.insert("v1", path);
     body.insert("v2", method);
 
-    let client = reqwest::Client::new();
     let resp = client
         .post(format!("{}/api/enforce", CONFIG.endpoint))
-        .header("Content-Type", "text/plain")
-        .header("Cookie", format!("casdoor_session_id={}", session))
         .json(&body)
+        .header("Content-Type", "text/plain")
+        .header("Authorization", format!("Bearer {}", token))
         .send()
         .await
         .map_err(|_| reject::reject())?;
@@ -80,6 +92,8 @@ pub async fn handle_authenticate(
         .map(|s| s.parse::<bool>())
         .map_err(|_| reject::reject())?
         .map_err(|_| reject::reject())?;
+
+    debug!("{:#?}, {}", body, res);
 
     if res {
         Ok(reply::with_status(reply::reply(), StatusCode::OK))

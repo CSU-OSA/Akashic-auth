@@ -40,5 +40,7 @@ client_secret = ""
 # The public key for the Casdoor application's cert
 jwt_pub_key = ""
 # The name for the Casdoor organization
-org_name = ""
+org_name = "Akashic"
+# Permission name in casddor web ui
+permission_name = "permission-akashic"
 ```

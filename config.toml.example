@@ -32,3 +32,4 @@ McmEm7jUL5tdIDZFrmp0lWVUD39dDhaF6xEr99gTwZmTVNOvxBVn1BY+SArSpx7b
 SDzwb0HZW4OfQB4yd4jJdLZEkQQsnSsji1lKzpXrNd2kjnWbTYAVBuNeS70D
 -----END CERTIFICATE-----"""
 org_name = "Akashic"
+permission_name = "permission-akashic"

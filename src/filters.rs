@@ -10,7 +10,6 @@ pub fn authenticate() -> impl Filter<Extract = impl Reply, Error = Rejection> + 
         .and(warp::header::<String>("Authorization"))
         .and(warp::header::<String>("X-Forwarded-Method"))
         .and(warp::header::<String>("X-Forwarded-Uri"))
-        .and(warp::cookie::<String>("casdoor_session_id"))
         .and_then(handlers::handle_authenticate)
 }
 
