@@ -4,6 +4,8 @@ A gateway service working with Casdoor and Caddy.
 
 一个与 [Casdoor](https://github.com/casdoor/casdoor)、[Caddy](https://github.com/caddyserver/caddy) 共同工作的网关微服务。
 
+![架构图](/structure.png "架构图")
+
 ## 构建运行
 
 ```shell
