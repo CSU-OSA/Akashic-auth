@@ -9,7 +9,7 @@ A gateway service working with Casdoor and Caddy.
 ```shell
 # Release build with builtin casbin support
 # You can also build a version that only using casdoor api 
-to enforce permission by running
+# to enforce permission by running
 # ~$ cargo build --no-default-features
 cargo build --release
 
