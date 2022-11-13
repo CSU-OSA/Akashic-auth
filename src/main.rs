@@ -3,6 +3,20 @@ mod filters;
 mod handlers;
 mod response;
 
+#[cfg(feature = "builtin-casbin")]
+mod actions;
+#[cfg(feature = "builtin-casbin")]
+mod adapter;
+#[cfg(feature = "builtin-casbin")]
+mod error;
+
+#[cfg(feature = "builtin-casbin")]
+use adapter::SqlxAdapter;
+#[cfg(feature = "builtin-casbin")]
+use casbin::DefaultModel;
+#[cfg(feature = "builtin-casbin")]
+use once_cell::sync::OnceCell;
+
 use chrono::Local;
 use clap::Parser;
 use entity::Config;
@@ -16,10 +30,20 @@ use warp::Filter;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// Configuration absolute path
+    /// Configuration's absolute path
     #[arg(short, long, default_value = "config.toml")]
     config: String,
+
+    #[cfg(feature = "builtin-casbin")]
+    /// Permission model file's absolute path
+    #[arg(short, long, default_value = "model.conf")]
+    model: String,
 }
+
+#[cfg(feature = "builtin-casbin")]
+static MODEL: OnceCell<DefaultModel> = OnceCell::new();
+#[cfg(feature = "builtin-casbin")]
+static ADAPTER: OnceCell<SqlxAdapter> = OnceCell::new();
 
 lazy_static! {
     static ref CONFIG: Config = load_conf();
@@ -59,9 +83,25 @@ fn load_conf() -> Config {
         .unwrap()
 }
 
+/// load permission model and policy adapter
+#[cfg(feature = "builtin-casbin")]
+async fn load_perm() {
+    let model = DefaultModel::from_file(&ARGS.model).await.unwrap();
+    if let Err(_) = MODEL.set(model) {
+        panic!("Load permission model into memory failed")
+    }
+    let adapter = SqlxAdapter::new(&CONFIG.casdoor_db, 8).await.unwrap();
+    if let Err(_) = ADAPTER.set(adapter) {
+        panic!("Load permission adapter into memory failed")
+    }
+}
+
 #[tokio::main]
 async fn main() {
     init_log();
+
+    #[cfg(feature = "builtin-casbin")]
+    load_perm().await;
 
     let log = warp::log::custom(|info| {
         info!("{} {}, {}", info.method(), info.path(), info.status());

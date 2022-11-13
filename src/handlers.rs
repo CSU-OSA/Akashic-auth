@@ -1,6 +1,11 @@
 use std::collections::HashMap;
 use std::convert::Infallible;
 
+#[cfg(feature = "builtin-casbin")]
+use crate::{ADAPTER, MODEL};
+#[cfg(feature = "builtin-casbin")]
+use casbin::{CoreApi, Enforcer};
+
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 use log::debug;
 use warp::hyper::StatusCode;
@@ -18,6 +23,54 @@ fn parse_jwt_token(token: &str) -> Result<CasdoorUser, Box<dyn std::error::Error
         &Validation::new(Algorithm::RS256),
     )?;
     Ok(res.claims)
+}
+
+// Authorization
+#[cfg(feature = "builtin-casbin")]
+async fn enforce(token: String, path: String, method: String) -> Result<bool, Rejection> {
+    // User's organization and name should not be changed by updating profile.
+    // So that a valid access_token can always get the valid id (owner/name)
+    let user = parse_jwt_token(&token).map_err(|_| reject::reject())?;
+    let sub = format!("{}/{}", user.owner, user.name);
+
+    let model = MODEL.get().ok_or(reject::reject())?;
+    let adapter = ADAPTER.get().ok_or(reject::reject())?;
+    let enforcer = Enforcer::new(model.clone(), adapter.clone()).await.unwrap();
+
+    let res = enforcer
+        .enforce((sub, path, method.to_lowercase()))
+        .map_err(|_| reject::reject())?;
+
+    Ok(res)
+}
+
+// Authorization
+#[cfg(not(feature = "builtin-casbin"))]
+async fn enforce(token: String, path: String, method: String) -> Result<bool, Rejection> {
+    let mut body = HashMap::new();
+    body.insert(
+        "id",
+        format!("{}/{}", CONFIG.org_name, CONFIG.permission_name),
+    );
+    body.insert("v1", path);
+    body.insert("v2", method.to_lowercase());
+
+    let resp = CLIENT
+        .post(format!("{}/api/enforce", CONFIG.endpoint))
+        .json(&body)
+        .header("Content-Type", "text/plain")
+        .header("Authorization", format!("Bearer {}", token))
+        .send()
+        .await
+        .map_err(|_| reject::reject())?;
+    let res = resp
+        .text()
+        .await
+        .map(|s| s.parse::<bool>())
+        .map_err(|_| reject::reject())?
+        .map_err(|_| reject::reject())?;
+
+    Ok(res)
 }
 
 /// Send code to casdoor api and return access_token if successful.
@@ -67,32 +120,7 @@ pub async fn handle_authenticate(
 
     // Authorization
 
-    let mut body = HashMap::new();
-    body.insert(
-        "id",
-        format!("{}/{}", CONFIG.org_name, CONFIG.permission_name),
-    );
-    body.insert("v1", path);
-    body.insert("v2", method.to_lowercase());
-
-    let resp = CLIENT
-        .post(format!("{}/api/enforce", CONFIG.endpoint))
-        .json(&body)
-        .header("Content-Type", "text/plain")
-        .header("Authorization", format!("Bearer {}", token))
-        .send()
-        .await
-        .map_err(|_| reject::reject())?;
-    let res = resp
-        .text()
-        .await
-        .map(|s| s.parse::<bool>())
-        .map_err(|_| reject::reject())?
-        .map_err(|_| reject::reject())?;
-
-    debug!("{:#?}, {}", body, res);
-
-    if res {
+    if enforce(token, path, method).await? {
         Ok(reply::with_status(reply::reply(), StatusCode::OK))
     } else {
         Ok(reply::with_status(reply::reply(), StatusCode::FORBIDDEN))

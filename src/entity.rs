@@ -1,6 +1,34 @@
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+#[cfg(feature = "builtin-casbin")]
+use sqlx::FromRow;
+
+#[allow(dead_code)]
+#[cfg(feature = "builtin-casbin")]
+#[derive(Debug, FromRow)]
+pub(crate) struct CasbinRule {
+    pub ptype: String,
+    pub v0: String,
+    pub v1: String,
+    pub v2: String,
+    pub v3: String,
+    pub v4: String,
+    pub v5: String,
+}
+
+#[cfg(feature = "builtin-casbin")]
+#[derive(Debug)]
+pub(crate) struct NewCasbinRule<'a> {
+    pub ptype: &'a str,
+    pub v0: &'a str,
+    pub v1: &'a str,
+    pub v2: &'a str,
+    pub v3: &'a str,
+    pub v4: &'a str,
+    pub v5: &'a str,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
     pub address: String,
@@ -11,7 +39,10 @@ pub struct Config {
     pub jwt_pub_key: String,
     pub org_name: String,
     pub app_name: Option<String>,
+    #[cfg(not(feature = "builtin-casbin"))]
     pub permission_name: String,
+    #[cfg(feature = "builtin-casbin")]
+    pub casdoor_db: String,
 }
 
 /// User info struct, defined in the SDK.

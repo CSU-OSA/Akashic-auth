@@ -33,3 +33,4 @@ SDzwb0HZW4OfQB4yd4jJdLZEkQQsnSsji1lKzpXrNd2kjnWbTYAVBuNeS70D
 -----END CERTIFICATE-----"""
 org_name = "Akashic"
 permission_name = "permission-akashic"
+casdoor_db = "mysql://db_user:db_pwd@locahost:3306/db_name"

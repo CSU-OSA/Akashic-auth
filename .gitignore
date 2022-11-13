@@ -1,3 +1,5 @@
 /.idea
 /target
 /config.toml
+/model.conf
+/.env

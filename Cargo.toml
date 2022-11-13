@@ -21,3 +21,16 @@ serde = "1.0.147"
 reqwest = { version = "0.11.12", features = ["json"] }
 jsonwebtoken = "8.1.1"
 clap = { version = "4.0.22", features = ["derive"] }
+
+sqlx = { version = "0.6.2", features = [ "mysql", "runtime-tokio-rustls", "offline" ], optional = true }
+casbin = { version = "2.0.9", features = [ "runtime-tokio" ], optional = true }
+async-trait = { version = "0.1.58", optional = true }
+dotenvy = { version = "0.15.6", optional = true }
+once_cell = { version = "1.16.0", optional = true }
+
+[features]
+default = ["builtin-casbin"]
+builtin-casbin = ["dep:casbin", "dep:async-trait", "dep:dotenvy", "dep:once_cell", "dep:sqlx"]
+
+[profile.dev.package.sqlx-macros]
+opt-level = 3

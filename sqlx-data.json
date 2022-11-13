@@ -1,0 +1,309 @@
+{
+  "db": "MySQL",
+  "15079952c95cb7902ed878d318a6a733f8bc25b604041bc3b0ab36e6c7631b90": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 7
+      }
+    },
+    "query": "DELETE FROM akashic_policy WHERE\n                    ptype = ? AND\n                    v0 = ? AND\n                    v1 = ? AND\n                    v2 = ? AND\n                    v3 = ? AND\n                    v4 = ? AND\n                    v5 = ?"
+  },
+  "212baf39e55e6fbf3e06b7d0ea5c2edb109bd4e85a0eb4b2a92a3a65ee40a669": {
+    "describe": {
+      "columns": [
+        {
+          "name": "ptype",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v0",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v1",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v2",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v3",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v4",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v5",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT * FROM akashic_policy"
+  },
+  "318abe4af5c8a2d88f5f2770424d03cd899d446b1e9aab985d9f0ba3d050d962": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 5
+      }
+    },
+    "query": "DELETE FROM akashic_policy WHERE\n                    ptype = ? AND\n                    (v2 is NULL OR v2 = COALESCE(?,v2)) AND\n                    (v3 is NULL OR v3 = COALESCE(?,v3)) AND\n                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND\n                    (v5 is NULL OR v5 = COALESCE(?,v5))"
+  },
+  "4cc314a39b7c308a74972599bf2cc5b2cb96acf540ea1b83be582aafb61a60b7": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "DELETE FROM akashic_policy"
+  },
+  "4f7286e302b50abbb11f7be553f79281d74a67989785f00eca6987f6d122e1bd": {
+    "describe": {
+      "columns": [
+        {
+          "name": "ptype",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v0",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v1",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v2",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v3",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v4",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "v5",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 9
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 12
+      }
+    },
+    "query": "SELECT * from  akashic_policy WHERE (\n            ptype LIKE 'g%' AND v0 LIKE ? AND v1 LIKE ? AND v2 LIKE ? AND v3 LIKE ? AND v4 LIKE ? AND v5 LIKE ? )\n        OR (\n            ptype LIKE 'p%' AND v0 LIKE ? AND v1 LIKE ? AND v2 LIKE ? AND v3 LIKE ? AND v4 LIKE ? AND v5 LIKE ? );\n            "
+  },
+  "5172d619817804d15b4f05f65dfc0677779df19cfb9f700ce28570fd02dddde7": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "CREATE TABLE IF NOT EXISTS akashic_policy (\n                    ptype VARCHAR(100) NOT NULL,\n                    v0 VARCHAR(100) NOT NULL,\n                    v1 VARCHAR(100) NOT NULL,\n                    v2 VARCHAR(100) NOT NULL,\n                    v3 VARCHAR(100) NOT NULL,\n                    v4 VARCHAR(100) NOT NULL,\n                    v5 VARCHAR(100) NOT NULL,\n                    CONSTRAINT unique_key_sqlx_adapter UNIQUE(ptype, v0, v1, v2, v3, v4, v5)\n                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+  },
+  "7d6324ebcd55f4ebe1bfb3b7ee8e2a6b60fafdfb2ea8571a24e314261c2f284d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 6
+      }
+    },
+    "query": "DELETE FROM akashic_policy WHERE\n                    ptype = ? AND\n                    (v1 is NULL OR v1 = COALESCE(?,v1)) AND\n                    (v2 is NULL OR v2 = COALESCE(?,v2)) AND\n                    (v3 is NULL OR v3 = COALESCE(?,v3)) AND\n                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND\n                    (v5 is NULL OR v5 = COALESCE(?,v5))"
+  },
+  "8e4818195d037b6e59fdeda0b6afb9deef318bbdb176c4ca6b0574de2da10c7c": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "DELETE FROM akashic_policy WHERE\n                    ptype = ? AND\n                    (v3 is NULL OR v3 = COALESCE(?,v3)) AND\n                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND\n                    (v5 is NULL OR v5 = COALESCE(?,v5))"
+  },
+  "9a549e3284307561a7bb6876de9f6750ba88edaac2c70b478244b60e4c3060b3": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 7
+      }
+    },
+    "query": "INSERT INTO akashic_policy ( ptype, v0, v1, v2, v3, v4, v5 )\n                 VALUES ( ?, ?, ?, ?, ?, ?, ? )"
+  },
+  "aa17cfc2fc3dbf4b054d11c15cc94ff638ba9059973f524723af38deb3107cee": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "DELETE FROM akashic_policy WHERE\n                    ptype = ? AND\n                    (v5 is NULL OR v5 = COALESCE(?,v5))"
+  },
+  "ab94ca9d61f78345445405eab87c919752cf0a72878879ddb825d4e3b3daef49": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 7
+      }
+    },
+    "query": "DELETE FROM akashic_policy WHERE\n                    ptype = ? AND\n                    (v0 is NULL OR v0 = COALESCE(?,v0)) AND\n                    (v1 is NULL OR v1 = COALESCE(?,v1)) AND\n                    (v2 is NULL OR v2 = COALESCE(?,v2)) AND\n                    (v3 is NULL OR v3 = COALESCE(?,v3)) AND\n                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND\n                    (v5 is NULL OR v5 = COALESCE(?,v5))"
+  },
+  "e708b125d18896cf41664cb9491de00931ce373d3e5aecaae82170db0ef0e9bb": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "DELETE FROM akashic_policy WHERE\n                    ptype = ? AND\n                    (v4 is NULL OR v4 = COALESCE(?,v4)) AND\n                    (v5 is NULL OR v5 = COALESCE(?,v5))"
+  }
+}
