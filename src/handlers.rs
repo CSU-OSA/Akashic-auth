@@ -146,6 +146,11 @@ pub async fn handle_authenticate(
     let msg = format!("{{token: {}, method: {}, path: {}}}", token, method, path);
     debug!("Authenticate inbound request: {}", msg);
 
+    // Remove url params
+    let path = path.split('?').collect::<Vec<&str>>().get(0)
+        .ok_or(reject::custom(CustomRejection { msg: "Split path failed".to_string() }))?
+        .to_string();
+
     // Authentication
 
     let resp = CLIENT.post(format!("{}/api/login/oauth/introspect?token={}&token_type_hint=access_token&client_id={}&client_secret={}", CONFIG.endpoint, token, CONFIG.client_id, CONFIG.client_secret))
