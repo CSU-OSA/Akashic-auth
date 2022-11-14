@@ -8,6 +8,7 @@ use casbin::{CoreApi, Enforcer};
 
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 use log::{debug, error};
+use reqwest::header::HeaderValue;
 use warp::hyper::StatusCode;
 use warp::reject::Reject;
 use warp::{reject, reply, Rejection, Reply};
@@ -35,18 +36,7 @@ fn parse_jwt_token(token: &str) -> Result<CasdoorUser, Box<dyn std::error::Error
 
 // Authorization
 #[cfg(feature = "builtin-casbin")]
-async fn enforce(token: String, path: String, method: String) -> Result<bool, Rejection> {
-    // User's organization and name should not be changed by updating profile.
-    // So that a valid access_token can always get the valid id (owner/name).
-    // Token should be valid when enforce permission control since authentication completed.
-    let user = parse_jwt_token(&token).map_err(|err| {
-        error!("{}", err);
-        reject::custom(CustomRejection {
-            msg: "Unexpected token when enforce permission control".to_string(),
-        })
-    })?;
-    let sub = format!("{}/{}", user.owner, user.name);
-
+async fn enforce(sub: &str, path: String, method: String) -> Result<bool, Rejection> {
     let model = MODEL.get().ok_or(reject::custom(CustomRejection {
         msg: "Get permission model from memory failed (None Model)".to_string(),
     }))?;
@@ -76,7 +66,7 @@ async fn enforce(token: String, path: String, method: String) -> Result<bool, Re
 
 // Authorization
 #[cfg(not(feature = "builtin-casbin"))]
-async fn enforce(token: String, path: String, method: String) -> Result<bool, Rejection> {
+async fn enforce(token: &str, path: String, method: String) -> Result<bool, Rejection> {
     let mut body = HashMap::new();
     body.insert(
         "id",
@@ -179,15 +169,32 @@ pub async fn handle_authenticate(
     debug!("{:#?}", resp);
 
     if !resp.active {
-        return Ok(reply::with_status(reply::reply(), StatusCode::UNAUTHORIZED));
+        return Ok(reply::with_status(reply::reply(), StatusCode::UNAUTHORIZED).into_response());
     }
 
     // Authorization
 
-    if enforce(token, path, method).await? {
-        Ok(reply::with_status(reply::reply(), StatusCode::OK))
+    // User's organization and name should not be changed by updating profile.
+    // So that a valid access_token can always get the valid id (owner/name).
+    // Token should be valid when enforce permission control since authentication completed.
+    let user = parse_jwt_token(&token).map_err(|err| {
+        error!("{}", err);
+        reject::custom(CustomRejection {
+            msg: "Unexpected token when enforce permission control".to_string(),
+        })
+    })?;
+    let sub = format!("{}/{}", user.owner, user.name);
+
+    if enforce(if cfg!(feature = "builtin-casbin") { &sub } else { &token }, path, method).await? {
+        let mut response = reply::with_status(reply::reply(), StatusCode::OK).into_response();
+        let remote_user = HeaderValue::from_str(&sub).map_err(|err| {
+            error!("{}", err);
+            reject::custom(CustomRejection { msg: "Add Remote-User header failed".to_string() })
+        })?;
+        response.headers_mut().append("Remote-User", remote_user);
+        Ok(response)
     } else {
-        Ok(reply::with_status(reply::reply(), StatusCode::FORBIDDEN))
+        Ok(reply::with_status(reply::reply(), StatusCode::FORBIDDEN).into_response())
     }
 }
 
@@ -196,7 +203,8 @@ pub async fn handle_authenticate(
 pub async fn err_handle(err: Rejection) -> Result<impl Reply, Infallible> {
     if let Some(e) = err.find::<CustomRejection>() {
         error!("{}", e.msg);
-        Ok(reply::with_status(reply::html(e.msg.clone()), StatusCode::BAD_GATEWAY))
+        // Project uses Cargo to build so the environment variable is always valid
+        Ok(reply::with_status(reply::html(format!("[{}] {}", env!("CARGO_PKG_NAME") ,e.msg.clone())), StatusCode::BAD_GATEWAY))
     } else {
         Ok(reply::with_status(reply::html("".to_string()), StatusCode::FORBIDDEN))
     }
