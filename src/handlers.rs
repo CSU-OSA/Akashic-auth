@@ -139,10 +139,18 @@ pub async fn handle_login(query: HashMap<String, String>) -> Result<impl Reply, 
 /// Then it will do authorization using casbin to check the request permission. 
 /// (sub, obj, act) <-> (owner/name, request path, lowercase request method)
 pub async fn handle_authenticate(
-    token: String,
+    token: Option<String>,
     method: String,
     path: String,
 ) -> Result<impl Reply, Rejection> {
+
+    let token = if method == "OPTIONS" {
+        // CORS precheck request
+        return Ok(reply::with_status(reply::reply(), StatusCode::OK).into_response())
+    } else {
+        token.ok_or(reject::reject())?
+    };
+
     let msg = format!("{{token: {}, method: {}, path: {}}}", token, method, path);
     debug!("Authenticate inbound request: {}", msg);
 

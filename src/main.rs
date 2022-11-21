@@ -107,10 +107,13 @@ async fn main() {
         info!("{} {}, {}", info.method(), info.path(), info.status());
     });
 
+    let cors = warp::cors().allow_any_origin(); // TODO: Add config to set cors
+
     let route = filters::authenticate()
         .or(filters::login())
         .recover(handlers::err_handle)
-        .with(log);
+        .with(log)
+        .with(cors);
 
     let addr = SocketAddr::new(
         CONFIG.address.parse().expect("Parse address failed"),

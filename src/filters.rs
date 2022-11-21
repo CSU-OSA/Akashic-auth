@@ -7,7 +7,7 @@ use crate::handlers;
 pub fn authenticate() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     warp::path!("authenticate")
         .and(warp::get())
-        .and(warp::header::<String>("Authorization"))
+        .and(warp::header::optional::<String>("Authorization"))
         .and(warp::header::<String>("X-Forwarded-Method"))
         .and(warp::header::<String>("X-Forwarded-Uri"))
         .and_then(handlers::handle_authenticate)
